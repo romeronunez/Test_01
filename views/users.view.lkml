@@ -103,4 +103,19 @@ view: users {
     type: count
     drill_fields: [id, first_name, last_name, orders.count]
   }
+  dimension: full_name {
+    type: string
+    sql: Concat(${first_name},'', ${last_name}) ;;
+  }
+  dimension: full_name_length {
+    type: number
+    sql: Length(${first_name},'', ${last_name});;
+  }
+  dimension: age_tier {
+    type: tier
+    tiers: [1, 10, 20, 30, 40, 50, 60, 70, 80, 90,99]
+    style: integer # the default value, could be excluded
+    sql: ${age} ;;
+  }
+
 }
