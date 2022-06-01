@@ -22,6 +22,12 @@ view: users {
     sql: ${TABLE}.age ;;
   }
 
+  dimension: order_history_button {
+    label: "Order History"
+    sql: ${TABLE}.id ;;
+    html: <a href="/explore/ecommerce_chris/order_items?fields=order_items.order_item_id, users.first_name, users.last_name, users.id, order_items.order_item_count, order_items.total_revenue&f[users.id]={{ value }}"><button>Order History</button></a> ;;
+  }
+
   # A measure is a field that uses a SQL aggregate function. Here are defined sum and average
   # measures for this dimension, but you can also add measures of many different aggregates.
   # Click on the type parameter to see all the options in the Quick Help panel on the right.
@@ -39,6 +45,15 @@ view: users {
   dimension: city {
     type: string
     sql: ${TABLE}.city ;;
+  }
+  dimension: city_link {
+    type: string
+    sql: ${TABLE}.city ;;
+    link: {
+      label: "Search the web"
+      url: "http://www.google.com/search?q={{ value | url_encode }}"
+      icon_url: "http://www.google.com/s2/favicons?domain=www.{{ value | url_encode }}.com"
+    }
   }
 
   dimension: country {
@@ -88,6 +103,16 @@ view: users {
     type: string
     sql: ${TABLE}.state ;;
   }
+  dimension: state_link {
+    type: string
+    sql: ${TABLE}.state ;;
+    map_layer_name: us_states
+    html: {% if _explore._name == "order_items" %}
+          <a href="/explore/ecommerce_chris/order_items?fields=order_items.detail*&f[users.state]= {{ value }}">{{ value }}</a>
+        {% else %}
+          <a href="/explore/ecommerce_chris/users?fields=users.detail*&f[users.state]={{ value }}">{{ value }}</a>
+        {% endif %} ;;
+  }
 
   dimension: traffic_source {
     type: string
@@ -98,18 +123,17 @@ view: users {
     type: zipcode
     sql: ${TABLE}.zip ;;
   }
-
   measure: count {
     type: count
     drill_fields: [id, first_name, last_name, orders.count]
   }
-  dimension: full_name {
-    type: string
-    sql: Concat(${first_name},'', ${last_name}) ;;
-  }
-  dimension: full_name_length {
+  dimension: last_name_length {
     type: number
-    sql: Length(${first_name},'', ${last_name});;
+    sql: Length(${last_name});;
+  }
+  dimension: first_name_length {
+    type: number
+    sql: Length(${first_name});;
   }
   dimension: age_tier {
     type: tier
@@ -117,5 +141,4 @@ view: users {
     style: integer # the default value, could be excluded
     sql: ${age} ;;
   }
-
 }
